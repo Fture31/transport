@@ -1,6 +1,6 @@
 "use client"
 
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "./ui/table"
 import { Button } from "./ui/button"
 import { Edit, Trash2 } from "lucide-react"
@@ -10,75 +10,111 @@ import {
   AlertDialogCancel,
   AlertDialogContent,
   AlertDialogDescription,
-  AlertDialogFooter,
   AlertDialogHeader,
   AlertDialogTitle,
+  AlertDialogFooter,
   AlertDialogTrigger,
 } from "./ui/alert-dialog"
 import AddEditModal from "./AddEditModal"
 
-// Données fictives pour l'exemple
-const initialData = [
-  {
-    id: 1,
-    date: "2023-01-15",
-    zone: "Zone A",
-    marque: "Yamaha",
-    type: "ppm",
-    poste: "Port Central",
-    responsable: "Jean Dupont",
-    adresse: "123 Rue du Port",
-    observation: "Bon état général",
-  },
-  {
-    id: 2,
-    date: "2023-02-20",
-    zone: "Zone B",
-    marque: "Mercury",
-    type: "pm",
-    poste: "Embarcadère Sud",
-    responsable: "Marie Martin",
-    adresse: "45 Avenue du Lac",
-    observation: "Nécessite une révision",
-  },
-  {
-    id: 3,
-    date: "2023-03-10",
-    zone: "Zone C",
-    marque: "Suzuki",
-    type: "pgc",
-    poste: "Quai Nord",
-    responsable: "Pierre Dubois",
-    adresse: "78 Boulevard Maritime",
-    observation: "",
-  },
-]
-
 export default function EnginTable() {
-  const [engins, setEngins] = useState(initialData)
+  const [engins, setEngins] = useState([])
   const [isModalOpen, setIsModalOpen] = useState(false)
   const [currentEngin, setCurrentEngin] = useState(null)
 
-  const handleDelete = (id) => {
-    setEngins(engins.filter((engin) => engin.id !== id))
+  // Charger les engins depuis l'API
+// Charger les engins depuis l'API
+useEffect(() => {
+  const fetchEngins = async () => {
+    try {
+      const token = localStorage.getItem("token");  // Récupérer le token depuis le localStorage
+      const response = await fetch("http://localhost:5000/engins", {
+        method: "GET",
+        headers: {
+          "Content-Type": "application/json",
+          "Authorization": `Bearer ${token}`,  // Ajouter le token dans l'en-tête
+        },
+      });
+
+      const data = await response.json();
+
+      if (response.ok) {
+        setEngins(data);
+      } else {
+        alert("Erreur lors de la récupération des engins");
+      }
+    } catch (error) {
+      console.error("Erreur lors du fetch:", error);
+      alert("Une erreur est survenue lors de la récupération des engins");
+    }
+  };
+
+  fetchEngins();
+}, []);
+
+
+  // Ajouter ou mettre à jour un engin via l'API
+  const handleSave = async (engin) => {
+    try {
+      const token = localStorage.getItem("token");
+      const method = currentEngin ? "PUT" : "POST"
+      const url = currentEngin ? `http://localhost:5000/engins/${engin.id}` : "http://localhost:5000/engins"
+
+      const response = await fetch(url, {
+        method: method,
+        headers: {
+          "Content-Type": "application/json",
+          "Authorization": `Bearer ${token}`,  // Ajouter le token dans l'en-tête
+        
+        },
+        body: JSON.stringify(engin),
+      })
+
+      const data = await response.json()
+
+      if (response.ok) {
+        if (currentEngin) {
+          setEngins(engins.map((e) => (e.id === engin.id ? engin : e)))
+        } else {
+          setEngins([...engins, data])
+        }
+        setIsModalOpen(false)
+        setCurrentEngin(null)
+      } else {
+        alert("Erreur lors de la sauvegarde de l'engin")
+      }
+    } catch (error) {
+      console.error("Erreur lors de l'envoi des données:", error)
+      alert("Une erreur est survenue")
+    }
   }
 
+  // Supprimer un engin via l'API
+  const handleDelete = async (id) => {
+    try {
+      const token = localStorage.getItem("token");  // Récupérer le token depuis le localStorage
+      const response = await fetch(`http://localhost:5000/engins/${id}`, {
+        method: "DELETE",
+        headers: {
+          "Authorization": `Bearer ${token}`,  // Ajouter le token dans l'en-tête
+        },
+      })
+
+      if (response.ok) {
+        setEngins(engins.filter((engin) => engin.id !== id))
+      } else {
+        alert("Erreur lors de la suppression de l'engin")
+      }
+    } catch (error) {
+      console.error("Erreur lors de la suppression:", error)
+      alert("Une erreur est survenue lors de la suppression de l'engin")
+    }
+  }
+
+  // Ouvrir le modal d'ajout ou d'édition
   const handleEdit = (engin) => {
     setCurrentEngin(engin)
     setIsModalOpen(true)
-  }
-
-  const handleSave = (engin) => {
-    if (currentEngin) {
-      // Mise à jour d'un engin existant
-      setEngins(engins.map((e) => (e.id === engin.id ? engin : e)))
-    } else {
-      // Ajout d'un nouvel engin
-      const newId = Math.max(...engins.map((e) => e.id), 0) + 1
-      setEngins([...engins, { ...engin, id: newId }])
-    }
-    setIsModalOpen(false)
-    setCurrentEngin(null)
   }
 
   const handleAddNew = () => {
@@ -183,4 +219,3 @@ export default function EnginTable() {
     </>
   )
 }
-

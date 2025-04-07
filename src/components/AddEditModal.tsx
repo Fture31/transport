@@ -46,13 +46,35 @@ export default function AddEditModal({ isOpen, onClose, onSave, engin }) {
     setFormData((prev) => ({ ...prev, type: value }))
   }
 
-  const handleSubmit = (e) => {
-    e.preventDefault()
-    onSave({
-      ...formData,
-      id: formData.id || 0,
-    })
-  }
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    const token = localStorage.getItem("token");
+    const method = engin ? "PUT" : "POST";
+    const url = engin ? `http://localhost:5000/engins/${engin.id}` : "http://localhost:5000/engins"; // Correction de l'URL ici
+
+
+    try {
+      const response = await fetch(url, {
+        method: method,
+        headers: {
+          "Content-Type": "application/json",
+          "Authorization": `Bearer ${token}`, // Ajouter le token dans l'en-tête
+        },
+        body: JSON.stringify(formData),
+      });
+
+      const data = await response.json();
+      if (response.ok) {
+        alert(engin ? "Engin mis à jour avec succès!" : "Engin ajouté avec succès!");
+        onSave(data); // Fermer ou mettre à jour le modal
+      } else {
+        alert(`Erreur: ${data.message}`);
+      }
+    } catch (error) {
+      console.error("Erreur lors de l'envoi des données", error);
+      alert("Une erreur est survenue");
+    }
+  };
 
   if (!isOpen) return null
 
@@ -134,7 +156,7 @@ export default function AddEditModal({ isOpen, onClose, onSave, engin }) {
           </div>
 
           <DialogFooter>
-            <Button  className="text-white"type="button" variant="outline" onClick={onClose}>
+            <Button className="text-white" type="button" variant="outline" onClick={onClose}>
               Annuler
             </Button>
             <Button type="submit">{engin ? "Mettre à jour" : "Ajouter"}</Button>
@@ -144,4 +166,3 @@ export default function AddEditModal({ isOpen, onClose, onSave, engin }) {
     </Dialog>
   )
 }
-

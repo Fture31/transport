@@ -1,16 +1,23 @@
 import { BrowserRouter as Router, Routes, Route, Link } from "react-router-dom"
 import EnginTable from "./components/EnginTable"
-import AjouterEngin from "./Page/AjouterEngin"
 import { Button } from "./components/ui/button"
 import { PlusCircle } from "lucide-react"
+import Login from "./Page/Login"
+import SignUp from "./Page/SignUp"
 
 function App() {
   return (
     <Router>
       <Routes>
-        <Route path="/" element={<HomePage />} />
+        {/* <Route path="/" element={<HomePage />} />
         <Route path="/ajouter" element={<AjouterEngin />} />
-      </Routes>
+        <Route path="/login" element={<Login />} />   {/* Ajouter route pour Login */}
+        {/* <Route path="/signup" element={<SignUp />} /> Ajouter route pour Inscription *} */}
+    
+      <Route path="/" element={<Login />} />  {/* Page de connexion comme première page */}
+      <Route path="/HomePage" element={<HomePage />} /> 
+
+        </Routes>
     </Router>
   )
 }
@@ -21,7 +28,7 @@ function HomePage() {
       <h1 className="text-2xl md:text-3xl font-bold text-center mb-8  text-gray-500">
         FICHE DE RECENSEMENT DES ENGINS DES TRANSPORTS FLUVIAL ET LACUSTRE
       </h1>
-
+{/* 
       <div className="flex justify-end  mb-4">
         <Link to="/ajouter">
           <Button className="flex items-center gap-2">
@@ -29,7 +36,7 @@ function HomePage() {
             Ajouter un engin
           </Button>
         </Link>
-      </div>
+      </div> */}
 
       <EnginTable />
 
