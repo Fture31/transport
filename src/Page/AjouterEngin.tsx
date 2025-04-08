@@ -34,10 +34,6 @@ export default function AjouterEngin() {
 
   const handleSubmit = (e) => {
     e.preventDefault()
-    // Ici, vous pourriez envoyer les données à une API
-    console.log(formData)
-
-    // Rediriger vers la page principale
     navigate("/")
   }
 

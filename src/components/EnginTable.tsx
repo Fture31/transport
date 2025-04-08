@@ -64,7 +64,7 @@ useEffect(() => {
         method: method,
         headers: {
           "Content-Type": "application/json",
-          "Authorization": `Bearer ${token}`,  // Ajouter le token dans l'en-tête
+          "Authorization": `Bearer ${token}`, 
         
         },
         body: JSON.stringify(engin),
@@ -88,15 +88,14 @@ useEffect(() => {
       alert("Une erreur est survenue")
     }
   }
-
   // Supprimer un engin via l'API
   const handleDelete = async (id) => {
     try {
-      const token = localStorage.getItem("token");  // Récupérer le token depuis le localStorage
+      const token = localStorage.getItem("token");  
       const response = await fetch(`http://localhost:5000/engins/${id}`, {
         method: "DELETE",
         headers: {
-          "Authorization": `Bearer ${token}`,  // Ajouter le token dans l'en-tête
+          "Authorization": `Bearer ${token}`,  
         },
       })
 

@@ -50,7 +50,7 @@ export default function AddEditModal({ isOpen, onClose, onSave, engin }) {
     e.preventDefault();
     const token = localStorage.getItem("token");
     const method = engin ? "PUT" : "POST";
-    const url = engin ? `http://localhost:5000/engins/${engin.id}` : "http://localhost:5000/engins"; // Correction de l'URL ici
+    const url = engin ? `http://localhost:5000/engins/${engin.id}` : "http://localhost:5000/engins"; 
 
 
     try {
@@ -58,7 +58,7 @@ export default function AddEditModal({ isOpen, onClose, onSave, engin }) {
         method: method,
         headers: {
           "Content-Type": "application/json",
-          "Authorization": `Bearer ${token}`, // Ajouter le token dans l'en-tête
+          "Authorization": `Bearer ${token}`,
         },
         body: JSON.stringify(formData),
       });
@@ -66,7 +66,7 @@ export default function AddEditModal({ isOpen, onClose, onSave, engin }) {
       const data = await response.json();
       if (response.ok) {
         alert(engin ? "Engin mis à jour avec succès!" : "Engin ajouté avec succès!");
-        onSave(data); // Fermer ou mettre à jour le modal
+        onSave(data); 
       } else {
         alert(`Erreur: ${data.message}`);
       }
